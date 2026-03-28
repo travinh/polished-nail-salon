@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const BOOKING_LINK =
   "https://nailsolutionplus.firebaseapp.com/?storeKey=-OG0RRmPtQSX5tBZxjf__NEW";
@@ -89,6 +89,11 @@ const team = [
     role: "Senior Nail Technician",
     specialty: "Acrylic, Tap, Builder Gel & Pedicure",
   },
+  {
+    name: "Tina",
+    role: "Nail Technician",
+    specialty: "Pedicure Expert",
+  },
 ];
 
 const instagramFeed = [
@@ -144,7 +149,7 @@ const sampleGallery = [
   {
     id: "g1",
     title: "Chrome Green",
-    src: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=1200&q=80",
+    src: "https://images.unsplash.com/photo-1771441580126-748bff7a9565?q=80&w=2268&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: "g2",
@@ -154,7 +159,7 @@ const sampleGallery = [
   {
     id: "g3",
     title: "Spa Pedicure",
-    src: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=1200&q=80",
+    src: "https://plus.unsplash.com/premium_photo-1661868866674-a1052e1257a2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: "g4",
@@ -169,7 +174,7 @@ const sampleGallery = [
   {
     id: "g6",
     title: "Pink Details",
-    src: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=80",
+    src: "https://images.unsplash.com/photo-1772322586649-fc11154e76b9?q=80&w=2268&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 ];
 
@@ -181,6 +186,12 @@ const hours = [
   ["Friday", "9:30 AM – 7:00 PM"],
   ["Saturday", "9:30 AM – 6:00 PM"],
   ["Sunday", "10:30 AM – 5:00 PM"],
+];
+
+const instagramPosts = [
+  "https://www.instagram.com/p/DWaQ9oOlkLN/?img_index=1",
+  "https://www.instagram.com/p/DWSLVk3As54/",
+  "https://www.instagram.com/p/DWDpsYVArmG/",
 ];
 
 const styles = `
@@ -616,6 +627,36 @@ const styles = `
   gap: 18px;
 }
 
+
+.instagram-embed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.instagram-embed-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+/* Override Instagram’s default 540 px width */
+.instagram-embed-card blockquote.instagram-media,
+.instagram-embed-card iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 900px) {
+  .instagram-embed-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .instagram-card {
   overflow: hidden;
   border-radius: 24px;
@@ -680,8 +721,24 @@ function GalleryCard({ item }) {
   );
 }
 
+function InstagramEmbed({ url }) {
+  return (
+    <blockquote
+      className="instagram-media"
+      data-instgrm-permalink={url}
+      data-instgrm-version="14"
+      style={{
+        margin: 0,
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: 0,
+      }}
+    />
+  );
+}
+
 export default function App() {
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedImages] = useState([]);
   const teamRef = useRef(null);
 
   const scrollTeam = (direction) => {
@@ -692,6 +749,21 @@ export default function App() {
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    const existing = document.querySelector(
+      'script[src="//www.instagram.com/embed.js"]',
+    );
+    if (!existing) {
+      const script = document.createElement("script");
+      script.src = "//www.instagram.com/embed.js";
+      script.async = true;
+      document.body.appendChild(script);
+      script.onload = () => window.instgrm?.Embeds.process();
+    } else {
+      window.instgrm?.Embeds.process();
+    }
+  }, []);
 
   const galleryItems = useMemo(() => {
     return [...uploadedImages, ...sampleGallery];
@@ -904,25 +976,11 @@ export default function App() {
                 Open Instagram
               </a>
             </div>
-
-            <div className="instagram-grid">
-              {instagramFeed.map((post) => (
-                <a
-                  key={post.id}
-                  href={post.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="instagram-card"
-                >
-                  <img
-                    src={post.image}
-                    alt={`${post.title} from Polished Nail Salon Instagram`}
-                  />
-                  <div className="instagram-meta">
-                    <strong>{post.title}</strong>
-                    <p>Tap to see more from @polished_nailsalon</p>
-                  </div>
-                </a>
+            <div className="instagram-embed-grid">
+              {instagramPosts.map((url) => (
+                <div key={url} className="instagram-embed-card">
+                  <InstagramEmbed url={url} />
+                </div>
               ))}
             </div>
           </section>
@@ -1034,7 +1092,10 @@ export default function App() {
                 Polished Nail Salon proudly serves Thornton, North Denver,
                 Westminster, Broomfield, Brighton, and nearby communities. We
                 specialize in cateye nails, chrome nails, gel manicures, spa
-                pedicures, and luxury nail art with easy online booking.
+                pedicures, and luxury nail art with easy online booking. Welcome
+                to Polished Nail Salon where we strive to give you the most
+                sanitary and best nail care and spa services available. Polished
+                Nail Salon is one of the best nail salons in Thornton, CO 80023.
               </p>
             </div>
           </section>

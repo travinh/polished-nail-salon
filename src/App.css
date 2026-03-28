@@ -40,3 +40,36 @@
 .read-the-docs {
   color: #888;
 }
+
+.instagram-embed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.instagram-embed-card {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px;
+}
+
+.instagram-embed-card blockquote.instagram-media {
+  margin: 0 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.instagram-embed-card iframe {
+  width: 100% !important;
+}
+
+@media (max-width: 900px) {
+  .instagram-embed-grid {
+    grid-template-columns: 1fr;
+  }
+}
