@@ -140,10 +140,61 @@ const reviews = [
 ];
 
 const promotions = [
-  "10% off your first visit",
-  "Ask about our rebooking perk before you check out",
-  "Follow us on Instagram and TikTok for fresh nail inspiration",
+  {
+    title: "Holiday Gift Card Bonus",
+    startsOn: "2026-11-15",
+    endsOn: "2026-12-31",
+    timing: "November 15 – December 31, 2026",
+    details: [
+      "Buy a $100 gift card and get a $10 bonus.",
+      "Buy a $500 gift card and get a $75 bonus.",
+    ],
+  },
+  {
+    title: "Happy Hour",
+    timing: "Monday–Thursday, 9:30 AM–2:30 PM",
+    details: [
+      "Enjoy one complimentary drink with a service over $35. Eligibility is based on your check-in time.",
+    ],
+  },
+  {
+    title: "Group Pedicure Special",
+    details: [
+      "Book pedicures for a group of three or more and each eligible guest receives one complimentary drink.",
+    ],
+  },
+  {
+    title: "New Client Special",
+    startsOn: "2026-11-15",
+    details: [
+      "Get 10% off your first three visits. We’ll verify your visit history at checkout.",
+    ],
+  },
+  {
+    title: "Refer a Friend",
+    details: [
+      "Returning clients get 15% off their service when they bring a new client.",
+    ],
+  },
+  {
+    title: "Lucky Draw Giveaway",
+    startsOn: "2026-11-01",
+    endsOn: "2026-12-31",
+    timing: "November 1 – December 31, 2026",
+    details: [
+      "Earn one entry with a service of $50 or more, or two entries with a service of $100 or more.",
+      "Gift card prizes: one $300, two $200, five $100, and ten $20. Limit one prize per person.",
+      "Drawing on December 31, 2026, on Instagram and TikTok.",
+    ],
+  },
 ];
+
+const salonDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Denver",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 const sampleGallery = [
   {
@@ -346,6 +397,11 @@ const styles = `
     gap: 12px;
     margin-top: 24px;
   }
+  .social-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -366,6 +422,7 @@ const styles = `
     border-color: #cbff58;
   }
   .btn-primary:hover { background: #d8ff82; }
+  .btn-promotions { color: #dfff9f; border-color: rgba(203,255,88,0.45); }
   .feature-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -545,8 +602,13 @@ const styles = `
     font-size: 18px;
   }
   .promo-card {
+    padding: 20px;
+    border-radius: 24px;
     background: linear-gradient(145deg, rgba(203,255,88,0.16), rgba(255,255,255,0.05));
   }
+  .promo-card h3 { margin: 0 0 10px; }
+  .promo-card .promo-timing { color: #dfff9f; font-weight: 600; }
+  .promo-card p + p { margin-top: 8px; }
   .gallery-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -740,6 +802,11 @@ function InstagramEmbed({ url }) {
 export default function App() {
   const [uploadedImages] = useState([]);
   const teamRef = useRef(null);
+  const salonDate = salonDateFormatter.format(new Date());
+  const currentPromotions = promotions.filter(
+    ({ startsOn, endsOn }) =>
+      (!startsOn || startsOn <= salonDate) && (!endsOn || salonDate <= endsOn),
+  );
 
   const scrollTeam = (direction) => {
     if (!teamRef.current) return;
@@ -774,8 +841,7 @@ export default function App() {
       <style>{styles}</style>
       <div className="site">
         <div className="promo-bar">
-          New guests 10% on the first visit • Book online or call{" "}
-          {PHONE_DISPLAY}
+          <a href="#promotions">See our current salon promotions</a>
         </div>
 
         <div className="container">
@@ -837,14 +903,19 @@ export default function App() {
                   Instagram
                 </a>
 
-                <a
-                  className="btn"
-                  href={TIKTOK}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  TikTok
-                </a>
+                <div className="social-buttons">
+                  <a
+                    className="btn"
+                    href={TIKTOK}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    TikTok
+                  </a>
+                  <a className="btn btn-promotions" href="#promotions">
+                    Promotions
+                  </a>
+                </div>
               </div>
               <div className="feature-list">
                 <div className="feature">
@@ -1008,24 +1079,27 @@ export default function App() {
             </div>
           </section>
 
-          <section className="section">
+          <section
+            className="section"
+            id="promotions"
+            aria-labelledby="promotions-title"
+          >
             <div className="section-head">
-              <div>
-                <h2>Current Promotions</h2>
-                <p className="section-sub">
-                  This gives you the promotional feel that many high-converting
-                  salon sites use near the middle or lower homepage.
-                </p>
-              </div>
+              <h2 id="promotions-title">Current Promotions</h2>
             </div>
             <div className="promo-grid">
-              {promotions.map((promo) => (
-                <article className="promo-card" key={promo}>
-                  <h3>Special Offer</h3>
-                  <p>{promo}</p>
+              {currentPromotions.map(({ title, timing, details }) => (
+                <article className="promo-card" key={title}>
+                  <h3>{title}</h3>
+                  {timing && <p className="promo-timing">{timing}</p>}
+                  {details.map((detail) => <p key={detail}>{detail}</p>)}
                 </article>
               ))}
             </div>
+            <p className="section-sub">
+              Alcoholic beverages are for guests 21+ with valid ID. Limit one
+              complimentary drink per eligible guest. Offers cannot be combined.
+            </p>
           </section>
 
           <section className="section" id="contact">
