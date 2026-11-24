@@ -167,13 +167,13 @@ const promotions = [
     title: "New Client Special",
     startsOn: "2026-11-15",
     details: [
-      "Get 10% off your first three visits on services over $35. We’ll verify your visit history at checkout.",
+      "Get 10% off your first visit on services over $35.",
     ],
   },
   {
     title: "Refer a Friend",
     details: [
-      "Returning clients get 15% off their service when they bring a new client.",
+      "Returning clients get 15% off their service when they refer a new client who receives a service over $35.",
     ],
   },
   {
