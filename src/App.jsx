@@ -167,7 +167,7 @@ const promotions = [
     title: "New Client Special",
     startsOn: "2026-11-15",
     details: [
-      "Get 10% off your first three visits. We’ll verify your visit history at checkout.",
+      "Get 10% off your first three visits on services over $35. We’ll verify your visit history at checkout.",
     ],
   },
   {
